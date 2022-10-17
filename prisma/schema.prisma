@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Person {
+  id        Int          @id @default(autoincrement())
+  name      String
+  address1  String
+  address2  String
+  city      String
+  state     String
+  country   Country      @relation(references: [id], fields: [countryId])
+  user      User         @relation(fields: [userId], references: [id])
+  userId    Int          @unique
+  countryId Int
+  status    PersonStatus @default(ACTIVE)
+}
+
+model User {
+  id      Int        @id @default(autoincrement())
+  email   String     @unique
+  contact Float
+  role    Role       @default(PARENT)
+  person  Person?
+  status  UserStatus @default(ACTIVE)
+}
+
+model Country {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  code    String   @unique
+  isoCode String   @unique
+  Person  Person[]
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  PARENT
+  CHILDREN
+  HOSPITAL_ADMIN
+  VACCINATION_CENTER_ADMIN
+}
+
+enum PersonStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
